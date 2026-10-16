@@ -854,12 +854,12 @@
         };
 
         const ADMIN_EMAIL = "buivandungvip1@gmail.com";
-        const WEB_NAME = "BVD-SONG";
+        const WEB_NAME = "UID-";
 
-        const LS_KEY_USED = "bvd_key_used_flag";
-        const LS_DEVICE_ID = "bvd_device_id";
-        const LS_LAST_SUBMIT = "bvd_last_submit_time";
-        const LS_USER_ACCOUNT = "bvd_user_account";
+        const LS_KEY_USED = "UID_key_used_flag";
+        const LS_DEVICE_ID = "UID_device_id";
+        const LS_LAST_SUBMIT = "UID_last_submit_time";
+        const LS_USER_ACCOUNT = "UID_user_account";
 
         let currentUser = null;
         let firebaseApp = null;
@@ -1114,7 +1114,7 @@
             saveUser(currentUser);
 
             const hashedHex = await sha256(`${currentUser.uid}-${Date.now()}-${Math.random()}`);
-            const secureKey = `BVD-2K-${hashedHex.substring(0, 16).toUpperCase()}`;
+            const secureKey = `UID-2K-${hashedHex.substring(0, 16).toUpperCase()}`;
 
             document.getElementById('purchasedKeyText').textContent = secureKey;
             document.getElementById('purchasedKeyDisplay').classList.add('active');
