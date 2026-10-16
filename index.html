@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Xác Thực Key</title>
+    <title>Hệ Thống Xác Thực Key — BVD v2</title>
     <style>
         :root {
             --primary-pink: #ff69b4;
@@ -13,727 +13,1325 @@
             --white: #ffffff;
             --error-red: #d93025;
             --success-green: #1e8e3e;
-            --bg-error: #fce8e6;
-            --bg-success: #e6f4ea;
             --bg-dark: #1a1a2e;
             --card-bg: #16213e;
             --input-bg: #0f3460;
             --border-color: #533483;
+            --discord-blue: #5865F2;
+            --gold: #ffd700;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body {
             background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 20% 50%, rgba(199, 21, 133, 0.15) 0%, transparent 50%),
-                              radial-gradient(circle at 80% 20%, rgba(83, 52, 131, 0.2) 0%, transparent 50%),
-                              radial-gradient(circle at 50% 80%, rgba(15, 52, 96, 0.3) 0%, transparent 50%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-            color: #e0e0e0;
+            background-image: radial-gradient(circle at 20% 50%, rgba(199,21,133,0.15) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(83,52,131,0.2) 0%, transparent 50%),
+                              radial-gradient(circle at 50% 80%, rgba(15,52,96,0.3) 0%, transparent 50%);
+            min-height: 100vh; display: flex; justify-content: center; align-items: center;
+            padding: 20px; position: relative; overflow-x: hidden; color: #e0e0e0;
         }
-
+        .top-bar {
+            position: absolute; top: 20px; left: 20px; right: 20px;
+            display: flex; justify-content: space-between; align-items: center; z-index: 1001;
+        }
+        .hamburger-btn {
+            width: 44px; height: 44px; background: rgba(22,33,62,0.95);
+            border: 1px solid var(--border-color); border-radius: 12px; cursor: pointer;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            gap: 5px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); transition: all 0.3s ease;
+        }
+        .hamburger-btn:hover { border-color: var(--primary-pink); box-shadow: 0 4px 15px rgba(255,105,180,0.3); }
+        .hamburger-btn span { display: block; width: 22px; height: 2.5px; background: var(--primary-pink); border-radius: 2px; transition: all 0.3s ease; }
+        .hamburger-btn.active span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+        .hamburger-btn.active span:nth-child(2) { opacity: 0; }
+        .hamburger-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+        .balance-badge {
+            background: rgba(22,33,62,0.95); padding: 10px 18px; border-radius: 25px;
+            font-weight: 800; color: var(--gold); box-shadow: 0 4px 15px rgba(0,0,0,0.4), 0 0 10px rgba(255,215,0,0.2);
+            font-size: 0.9rem; border: 1px solid var(--border-color); letter-spacing: 0.5px;
+            display: none; align-items: center; gap: 8px;
+        }
+        .balance-badge.active { display: flex; }
+        .balance-badge .coin-icon { font-size: 1.1rem; }
         .corner-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(22, 33, 62, 0.95);
-            padding: 10px 18px;
-            border-radius: 25px;
-            font-weight: 800;
-            color: var(--primary-pink);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4), 0 0 10px rgba(255, 105, 180, 0.2);
-            z-index: 100;
-            font-size: 1rem;
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(22,33,62,0.95); padding: 10px 18px; border-radius: 25px;
+            font-weight: 800; color: var(--primary-pink); box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            z-index: 100; font-size: 0.85rem; border: 1px solid var(--border-color);
+            display: none;
+        }
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 999; opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+        .sidebar {
+            position: fixed; top: 0; left: -320px; width: 300px; height: 100%;
+            background: var(--card-bg); border-right: 1px solid var(--border-color); z-index: 1000;
+            transition: left 0.3s cubic-bezier(0.16,1,0.3,1); display: flex; flex-direction: column;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.5);
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-header {
+            padding: 25px 20px; background: linear-gradient(135deg,#0f3460,#533483);
+            border-bottom: 1px solid var(--border-color); text-align: center;
+        }
+        .sidebar-header h2 { color: var(--primary-pink); font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px; }
+        .sidebar-header p { color: #808090; font-size: 0.75rem; }
+        .sidebar-user-info {
+            padding: 15px 20px; background: rgba(15,52,96,0.3);
+            border-bottom: 1px solid rgba(83,52,131,0.2); display: none; align-items: center; gap: 12px;
+        }
+        .sidebar-user-info.active { display: flex; }
+        .sidebar-avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--primary-pink); object-fit: cover; background: var(--input-bg); }
+        .sidebar-user-details { flex: 1; }
+        .sidebar-user-details .user-name { font-size: 0.9rem; color: #e0e0e0; font-weight: 600; }
+        .sidebar-user-details .uid-display { font-size: 0.65rem; color: var(--primary-pink); font-family: 'Courier New',monospace; word-break: break-all; margin-top: 3px; }
+        .sidebar-balance {
+            padding: 12px 20px; background: rgba(255,215,0,0.05);
+            border-bottom: 1px solid rgba(83,52,131,0.2); display: none; align-items: center; gap: 10px;
+        }
+        .sidebar-balance.active { display: flex; }
+        .sidebar-balance .bal-label { font-size: 0.75rem; color: #808090; }
+        .sidebar-balance .bal-amount { font-size: 1.1rem; color: var(--gold); font-weight: 800; font-family: 'Courier New',monospace; }
+        .sidebar-nav { flex: 1; padding: 10px 0; overflow-y: auto; }
+        .nav-section-title { padding: 12px 20px 6px; font-size: 0.65rem; color: #505070; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+        .nav-item {
+            padding: 14px 20px; color: #a0a0b0; cursor: pointer; transition: all 0.2s ease;
+            font-size: 0.9rem; font-weight: 500; border-left: 3px solid transparent;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .nav-item:hover { background: rgba(83,52,131,0.2); color: var(--white); border-left-color: var(--primary-pink); }
+        .nav-item.active { background: rgba(199,21,133,0.15); color: var(--primary-pink); border-left-color: var(--primary-pink); }
+        .nav-item.locked { opacity: 0.4; cursor: not-allowed; }
+        .nav-item.locked:hover { background: transparent; color: #a0a0b0; border-left-color: transparent; }
+        .nav-icon { font-size: 1.1rem; width: 24px; text-align: center; }
+        .sidebar-footer { padding: 15px 20px; border-top: 1px solid rgba(83,52,131,0.2); }
+        .logout-btn {
+            background: rgba(217,48,37,0.15); border: 1px solid rgba(217,48,37,0.3);
+            color: #ef5350; padding: 10px; border-radius: 8px; cursor: pointer;
+            width: 100%; font-weight: 600; font-size: 0.85rem; transition: all 0.2s ease; display: none;
+        }
+        .logout-btn.active { display: block; }
+        .logout-btn:hover { background: rgba(217,48,37,0.3); }
+        .login-sidebar-btn {
+            background: linear-gradient(135deg,var(--dark-pink),#e91e63); border: none;
+            color: white; padding: 12px; border-radius: 8px; cursor: pointer;
+            width: 100%; font-weight: 700; font-size: 0.85rem; transition: all 0.2s ease; display: block;
+        }
+        .login-sidebar-btn.hidden { display: none; }
+        .login-sidebar-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(199,21,133,0.4); }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 2000; display: none;
+            justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(8px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-overlay.forced { backdrop-filter: blur(15px); }
+        .modal {
+            background: var(--card-bg); border-radius: 20px; width: 100%; max-width: 420px;
             border: 1px solid var(--border-color);
-            letter-spacing: 0.5px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(199,21,133,0.15);
+            animation: modalIn 0.4s cubic-bezier(0.16,1,0.3,1); overflow: hidden;
         }
-
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.85) translateY(30px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-header {
+            padding: 25px 20px; text-align: center;
+            background: linear-gradient(135deg,#0f3460,#533483); border-bottom: 1px solid var(--border-color);
+        }
+        .modal-header h3 { color: var(--white); font-size: 1.15rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 800; }
+        .modal-header p { color: #808090; font-size: 0.78rem; margin-top: 6px; }
+        .modal-body { padding: 25px 20px; display: flex; flex-direction: column; gap: 10px; }
+        .social-login-btn {
+            width: 100%; padding: 13px 16px; border-radius: 12px;
+            border: 1px solid rgba(83,52,131,0.3); background: var(--input-bg);
+            color: #e0e0e0; font-size: 0.88rem; font-weight: 600; cursor: pointer;
+            transition: all 0.25s ease; display: flex; align-items: center; justify-content: center;
+            gap: 12px; position: relative; overflow: hidden;
+        }
+        .social-login-btn::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent); transition: left 0.5s ease;
+        }
+        .social-login-btn:hover::after { left: 100%; }
+        .social-login-btn:hover { border-color: var(--primary-pink); background: rgba(15,52,96,0.9); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .social-login-btn:active { transform: translateY(0); }
+        .social-login-btn.google { border-left: 4px solid #4285f4; }
+        .social-login-btn.google .btn-icon { color: #4285f4; font-weight: 900; font-size: 1.2rem; }
+        .social-login-btn.facebook { border-left: 4px solid #1877f2; }
+        .social-login-btn.facebook .btn-icon { color: #1877f2; font-weight: 900; font-size: 1.2rem; }
+        .social-login-btn.discord { border-left: 4px solid var(--discord-blue); }
+        .social-login-btn.discord .btn-icon { color: var(--discord-blue); font-weight: 900; font-size: 1.1rem; }
+        .social-login-btn.twitter { border-left: 4px solid #e0e0e0; }
+        .social-login-btn.twitter .btn-icon { color: #e0e0e0; font-weight: 900; font-size: 1.1rem; }
+        .social-login-btn.guest { border-left: 4px solid var(--primary-pink); margin-top: 5px; border-top: 1px solid rgba(83,52,131,0.2); padding-top: 13px; }
+        .social-login-btn.guest .btn-icon { color: var(--primary-pink); font-size: 1.1rem; }
+        .btn-icon { width: 24px; text-align: center; flex-shrink: 0; }
+        .divider { display: flex; align-items: center; gap: 12px; margin: 5px 0; }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(83,52,131,0.3); }
+        .divider span { font-size: 0.72rem; color: #606080; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .modal-close {
+            width: 100%; padding: 12px; background: transparent;
+            border: 1px solid rgba(83,52,131,0.3); color: #808090; border-radius: 10px;
+            cursor: pointer; font-size: 0.85rem; margin-top: 8px; transition: all 0.2s ease; font-weight: 600;
+        }
+        .modal-close:hover { border-color: #ef5350; color: #ef5350; background: rgba(217,48,37,0.05); }
+        .modal-close.hidden { display: none; }
+        .auth-loading { display: none; flex-direction: column; align-items: center; gap: 15px; padding: 30px 20px; }
+        .auth-loading.active { display: flex; }
+        .auth-spinner { width: 40px; height: 40px; border: 4px solid rgba(255,105,180,0.2); border-top-color: var(--primary-pink); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .auth-loading p { color: #a0a0b0; font-size: 0.85rem; }
         .container {
-            background: var(--card-bg);
-            width: 100%;
-            max-width: 520px;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(199, 21, 133, 0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            border: 1px solid rgba(83, 52, 131, 0.3);
+            background: var(--card-bg); width: 100%; max-width: 520px; border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(199,21,133,0.1);
+            overflow: hidden; display: flex; flex-direction: column;
+            animation: slideUp 0.6s cubic-bezier(0.16,1,0.3,1); border: 1px solid rgba(83,52,131,0.3);
+            margin-top: 70px;
         }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .header {
-            background: linear-gradient(135deg, #0f3460, #533483, var(--dark-pink));
-            color: var(--white);
-            padding: 30px 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(135deg,#0f3460,#533483,var(--dark-pink));
+            color: var(--white); padding: 30px 20px; text-align: center; position: relative; overflow: hidden;
         }
-
         .header::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.03), transparent);
-            transform: rotate(45deg);
-            animation: headerShine 6s infinite;
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg,transparent,rgba(255,255,255,0.03),transparent);
+            transform: rotate(45deg); animation: headerShine 6s infinite;
         }
-
-        @keyframes headerShine {
-            0% { transform: translateX(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) rotate(45deg); }
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 800;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 1;
-        }
-
-        .header p {
-            font-size: 0.85rem;
-            opacity: 0.8;
-            font-weight: 500;
-            letter-spacing: 1px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .content {
-            padding: 30px 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 22px;
-        }
-
-        .qr-section {
-            text-align: center;
-            border-bottom: 1px solid rgba(83, 52, 131, 0.3);
-            padding-bottom: 25px;
-        }
-
+        @keyframes headerShine { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }
+        .header h1 { font-size: 1.5rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.3); position: relative; z-index: 1; }
+        .header p { font-size: 0.85rem; opacity: 0.8; font-weight: 500; letter-spacing: 1px; position: relative; z-index: 1; }
+        .content { padding: 30px 25px; display: flex; flex-direction: column; gap: 22px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: flex; flex-direction: column; gap: 22px; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .qr-section { text-align: center; border-bottom: 1px solid rgba(83,52,131,0.3); padding-bottom: 25px; }
         .qr-placeholder {
-            width: 180px;
-            height: 180px;
-            background: var(--white);
-            margin: 0 auto 15px;
-            border: 3px solid var(--border-color);
-            border-radius: 16px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3), inset 0 0 20px rgba(255,255,255,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 200px; height: 200px; background: var(--white); margin: 0 auto 15px;
+            border: 3px solid var(--border-color); border-radius: 16px;
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3); transition: transform 0.3s ease;
         }
-
-        .qr-placeholder:hover {
-            transform: scale(1.03);
-            box-shadow: 0 12px 35px rgba(199, 21, 133, 0.2), inset 0 0 20px rgba(255,255,255,0.1);
+        .qr-placeholder:hover { transform: scale(1.03); box-shadow: 0 12px 35px rgba(199,21,133,0.2); }
+        .qr-placeholder img { width: 100%; height: 100%; object-fit: contain; }
+        .contact-info { font-size: 0.88rem; color: #a0a0b0; margin-top: 12px; line-height: 1.6; }
+        .contact-info strong { color: var(--primary-pink); font-weight: 700; }
+        .note-section { background: rgba(15,52,96,0.3); border: 1px solid rgba(83,52,131,0.3); border-radius: 14px; padding: 18px; }
+        .note-section h4 { color: var(--primary-pink); font-size: 0.85rem; margin-bottom: 10px; font-weight: 700; }
+        .note-display {
+            background: var(--input-bg); border: 1px solid rgba(83,52,131,0.4); border-radius: 8px;
+            padding: 12px; font-family: 'Courier New',monospace; font-size: 0.85rem;
+            color: #4caf50; word-break: break-all; line-height: 1.6; user-select: all;
         }
-
-        .qr-placeholder img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+        .copy-note-btn {
+            margin-top: 10px; padding: 10px; background: rgba(83,52,131,0.3);
+            border: 1px solid var(--border-color); color: var(--light-pink); border-radius: 8px;
+            cursor: pointer; font-size: 0.8rem; font-weight: 600; width: 100%; transition: all 0.2s ease;
         }
-
-        .contact-info {
-            font-size: 0.88rem;
-            color: #a0a0b0;
-            margin-top: 12px;
-            line-height: 1.6;
-        }
-
-        .contact-info strong {
-            color: var(--primary-pink);
-            font-weight: 700;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        label {
-            font-weight: 600;
-            color: #c0c0d0;
-            font-size: 0.9rem;
-            letter-spacing: 0.3px;
-        }
-
+        .copy-note-btn:hover { background: rgba(83,52,131,0.5); }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-weight: 600; color: #c0c0d0; font-size: 0.9rem; letter-spacing: 0.3px; }
         input {
-            padding: 14px 16px;
-            border: 2px solid rgba(83, 52, 131, 0.4);
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            outline: none;
-            background: var(--input-bg);
-            color: #e0e0e0;
+            padding: 14px 16px; border: 2px solid rgba(83,52,131,0.4); border-radius: 12px;
+            font-size: 1rem; transition: all 0.3s ease; outline: none;
+            background: var(--input-bg); color: #e0e0e0;
         }
-
-        input::placeholder {
-            color: #606080;
-        }
-
-        input:focus {
-            border-color: var(--primary-pink);
-            background: rgba(15, 52, 96, 0.8);
-            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.15), 0 0 20px rgba(255, 105, 180, 0.05);
-        }
-
-        input:disabled {
-            background: rgba(15, 52, 96, 0.3);
-            cursor: not-allowed;
-            border-color: rgba(83, 52, 131, 0.2);
-            color: #606080;
-        }
-
-        button {
-            background: linear-gradient(135deg, var(--dark-pink), #e91e63, #ff4081);
-            background-size: 200% 200%;
-            color: var(--white);
-            border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(199, 21, 133, 0.3);
+        input::placeholder { color: #606080; }
+        input:focus { border-color: var(--primary-pink); background: rgba(15,52,96,0.8); box-shadow: 0 0 0 3px rgba(255,105,180,0.15); }
+        input:disabled { background: rgba(15,52,96,0.3); cursor: not-allowed; border-color: rgba(83,52,131,0.2); color: #606080; }
+        button.main-action {
+            background: linear-gradient(135deg,var(--dark-pink),#e91e63,#ff4081);
+            background-size: 200% 200%; color: var(--white); border: none; padding: 16px;
+            border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease; width: 100%; text-transform: uppercase; letter-spacing: 1px;
+            position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(199,21,133,0.3);
             animation: gradientShift 3s ease infinite;
         }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        button.main-action::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent); transition: left 0.5s ease;
         }
-
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        button:hover:not(:disabled)::before {
-            left: 100%;
-        }
-
-        button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(199, 21, 133, 0.5);
-        }
-
-        button:active:not(:disabled) {
-            transform: translateY(0);
-            box-shadow: 0 4px 15px rgba(199, 21, 133, 0.3);
-        }
-
-        button:disabled {
-            background: #2a2a4a;
-            cursor: not-allowed;
-            box-shadow: none;
-            color: #606080;
-            animation: none;
-        }
-
+        button.main-action:hover:not(:disabled)::before { left: 100%; }
+        button.main-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(199,21,133,0.5); }
+        button.main-action:disabled { background: #2a2a4a; cursor: not-allowed; box-shadow: none; color: #606080; animation: none; }
         .btn-skip {
-            background: linear-gradient(135deg, #533483, #0f3460, #16213e);
-            background-size: 200% 200%;
-            box-shadow: 0 4px 15px rgba(83, 52, 131, 0.3);
-            font-size: 0.85rem;
-            padding: 12px;
-            margin-top: -10px;
-            display: none;
-            animation: gradientShift 4s ease infinite;
+            background: linear-gradient(135deg,#533483,#0f3460,#16213e); background-size: 200% 200%;
+            box-shadow: 0 4px 15px rgba(83,52,131,0.3); font-size: 0.85rem; padding: 12px;
+            margin-top: -10px; display: none; animation: gradientShift 4s ease infinite;
+            color: var(--white); border: none; border-radius: 12px; font-weight: 700;
+            cursor: pointer; width: 100%; transition: all 0.3s ease;
         }
-
-        .btn-skip:hover:not(:disabled) {
-            box-shadow: 0 8px 25px rgba(83, 52, 131, 0.5);
-        }
-
         .status-msg {
-            padding: 14px 16px;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: none;
-            margin-top: 5px;
-            line-height: 1.5;
-            animation: fadeIn 0.3s ease;
+            padding: 14px 16px; border-radius: 12px; text-align: center;
+            font-size: 0.9rem; font-weight: 600; display: none; margin-top: 5px;
+            line-height: 1.5; animation: fadeIn 0.3s ease;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .status-success {
-            background: rgba(30, 142, 62, 0.15);
-            color: #4caf50;
-            border: 1px solid rgba(30, 142, 62, 0.3);
-        }
-
-        .status-error {
-            background: rgba(217, 48, 37, 0.15);
-            color: #ef5350;
-            border: 1px solid rgba(217, 48, 37, 0.3);
-        }
-
+        .status-success { background: rgba(30,142,62,0.15); color: #4caf50; border: 1px solid rgba(30,142,62,0.3); }
+        .status-error { background: rgba(217,48,37,0.15); color: #ef5350; border: 1px solid rgba(217,48,37,0.3); }
         .footer {
-            background: rgba(10, 10, 20, 0.5);
-            padding: 20px;
-            text-align: center;
-            font-size: 0.78rem;
-            color: #606080;
-            border-top: 1px solid rgba(83, 52, 131, 0.2);
+            background: rgba(10,10,20,0.5); padding: 20px; text-align: center;
+            font-size: 0.78rem; color: #606080; border-top: 1px solid rgba(83,52,131,0.2);
         }
-
-        .spinner {
-            display: none;
-            width: 22px;
-            height: 22px;
-            border: 3px solid rgba(255,255,255,0.2);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto;
+        .spinner { display: none; width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.2); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; margin: 0 auto; }
+        .device-id-display { font-size: 0.72rem; color: #505070; text-align: center; margin-top: -8px; word-break: break-all; font-family: 'Courier New',monospace; letter-spacing: 0.5px; }
+        .info-panel { background: rgba(15,52,96,0.3); border: 1px solid rgba(83,52,131,0.2); border-radius: 12px; padding: 15px; margin-top: 5px; }
+        .info-panel h3 { font-size: 0.85rem; color: var(--primary-pink); margin-bottom: 8px; font-weight: 700; }
+        .info-panel ul { list-style: none; padding: 0; }
+        .info-panel li { font-size: 0.8rem; color: #808090; padding: 3px 0; padding-left: 15px; position: relative; }
+        .info-panel li::before { content: '\25B8'; position: absolute; left: 0; color: var(--border-color); }
+        .back-btn {
+            background: rgba(83,52,131,0.3); border: 1px solid var(--border-color);
+            color: #a0a0b0; padding: 10px; border-radius: 8px; cursor: pointer;
+            font-weight: 600; font-size: 0.8rem; width: 100%; transition: all 0.2s ease;
+            margin-top: 10px; text-transform: none; letter-spacing: 0; animation: none; box-shadow: none;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .back-btn:hover { background: rgba(83,52,131,0.5); color: var(--white); transform: none; }
+        .key-shop { display: flex; flex-direction: column; gap: 12px; }
+        .key-item {
+            background: rgba(15,52,96,0.3); border: 1px solid rgba(83,52,131,0.3);
+            border-radius: 14px; padding: 18px; display: flex; justify-content: space-between;
+            align-items: center; transition: all 0.3s ease;
         }
-
-        .device-id-display {
-            font-size: 0.72rem;
-            color: #505070;
-            text-align: center;
-            margin-top: -8px;
-            word-break: break-all;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 0.5px;
+        .key-item:hover { border-color: var(--primary-pink); }
+        .key-info h4 { color: #e0e0e0; font-size: 0.95rem; margin-bottom: 4px; }
+        .key-info p { color: #808090; font-size: 0.75rem; }
+        .key-price { color: var(--gold); font-weight: 800; font-size: 1.1rem; }
+        .buy-btn {
+            padding: 10px 20px; background: linear-gradient(135deg,var(--dark-pink),#e91e63);
+            border: none; color: var(--white); border-radius: 8px; cursor: pointer;
+            font-weight: 700; font-size: 0.8rem; transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(199,21,133,0.3);
         }
-
-        .info-panel {
-            background: rgba(15, 52, 96, 0.3);
-            border: 1px solid rgba(83, 52, 131, 0.2);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 5px;
+        .buy-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(199,21,133,0.4); }
+        .buy-btn:disabled { background: #2a2a4a; cursor: not-allowed; box-shadow: none; color: #606080; transform: none; }
+        .purchased-key-display {
+            background: rgba(30,142,62,0.1); border: 1px solid rgba(30,142,62,0.3);
+            border-radius: 12px; padding: 15px; display: none; flex-direction: column; gap: 10px; animation: fadeIn 0.3s ease;
         }
-
-        .info-panel h3 {
-            font-size: 0.85rem;
-            color: var(--primary-pink);
-            margin-bottom: 8px;
-            font-weight: 700;
+        .purchased-key-display.active { display: flex; }
+        .purchased-key-display h4 { color: #4caf50; font-size: 0.85rem; text-align: center; }
+        .key-text-box {
+            background: var(--input-bg); border: 1px solid rgba(30,142,62,0.3); border-radius: 8px;
+            padding: 12px; font-family: 'Courier New',monospace; font-size: 0.85rem;
+            color: #4caf50; text-align: center; word-break: break-all; user-select: all; font-weight: 700; letter-spacing: 1px;
         }
-
-        .info-panel ul {
-            list-style: none;
-            padding: 0;
+        .copy-key-btn {
+            padding: 10px; background: rgba(30,142,62,0.2); border: 1px solid rgba(30,142,62,0.4);
+            color: #4caf50; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.2s ease;
         }
-
-        .info-panel li {
-            font-size: 0.8rem;
-            color: #808090;
-            padding: 3px 0;
-            padding-left: 15px;
-            position: relative;
+        .copy-key-btn:hover { background: rgba(30,142,62,0.3); }
+        .order-id-display {
+            background: rgba(83,52,131,0.2); border: 1px solid rgba(83,52,131,0.4);
+            border-radius: 8px; padding: 10px; font-family: 'Courier New',monospace;
+            font-size: 0.75rem; color: var(--primary-pink); text-align: center; word-break: break-all;
         }
-
-        .info-panel li::before {
-            content: '▸';
-            position: absolute;
-            left: 0;
-            color: var(--border-color);
+        @media (max-width: 480px) {
+            .key-item { flex-direction: column; gap: 12px; text-align: center; }
+            .modal { max-width: 100%; margin: 10px; }
+            .top-bar { left: 10px; right: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="corner-badge">7 @Buivandung2012</div>
+    <div class="top-bar">
+        <button class="hamburger-btn" id="hamburgerBtn" onclick="handleHamburgerClick()">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="balance-badge" id="balanceBadge">
+            <span class="coin-icon">&#128176;</span>
+            <span id="balanceAmount">0</span> VND
+        </div>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>BVD SYSTEM v2</h2>
+            <p>Quản lý tài khoản</p>
+        </div>
+        <div class="sidebar-user-info" id="sidebarUserInfo">
+            <img class="sidebar-avatar" id="sidebarAvatar" src="" alt="Avatar">
+            <div class="sidebar-user-details">
+                <div class="user-name" id="sidebarUserName"></div>
+                <div class="uid-display" id="sidebarUserUid"></div>
+            </div>
+        </div>
+        <div class="sidebar-balance" id="sidebarBalance">
+            <span class="bal-label">Số dư:</span>
+            <span class="bal-amount" id="sidebarBalAmount">0 VND</span>
+        </div>
+        <div class="sidebar-nav">
+            <div class="nav-section-title">Chức năng chính</div>
+            <div class="nav-item active" id="navActivate" onclick="handleNavClick('activate')">
+                <span class="nav-icon">&#9889;</span> Kích hoạt Key
+            </div>
+            <div class="nav-item locked" id="navDeposit" onclick="handleNavClick('deposit')">
+                <span class="nav-icon">&#128176;</span> Nạp tiền &#128274;
+            </div>
+            <div class="nav-item locked" id="navBuykey" onclick="handleNavClick('buykey')">
+                <span class="nav-icon">&#128273;</span> Mua Key &#128274;
+            </div>
+            <div class="nav-section-title" style="margin-top:10px;">Tài khoản</div>
+            <div class="nav-item" id="navProfile" onclick="handleNavClick('profile')" style="display:none;">
+                <span class="nav-icon">&#128100;</span> Thông tin tài khoản
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <button class="login-sidebar-btn" id="loginSidebarBtn" onclick="openLoginModal(true)">Đăng nhập</button>
+            <button class="logout-btn" id="logoutBtn" onclick="logoutUser()">Đăng xuất</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>ĐĂNG NHẬP HỆ THỐNG</h3>
+                <p>Chọn phương thức xác thực</p>
+            </div>
+            <div class="modal-body" id="modalBodyButtons">
+                <button class="social-login-btn google" onclick="realSocialLogin('google')">
+                    <span class="btn-icon">G</span> Đăng nhập bằng Google
+                </button>
+                <button class="social-login-btn facebook" onclick="realSocialLogin('facebook')">
+                    <span class="btn-icon">f</span> Đăng nhập bằng Facebook
+                </button>
+                <button class="social-login-btn discord" onclick="realSocialLogin('discord')">
+                    <span class="btn-icon">D</span> Đăng nhập bằng Discord
+                </button>
+                <button class="social-login-btn twitter" onclick="realSocialLogin('twitter')">
+                    <span class="btn-icon">&#120143;</span> Đăng nhập bằng X (Twitter)
+                </button>
+                <div class="divider"><span>hoặc</span></div>
+                <button class="social-login-btn guest" onclick="guestLogin()">
+                    <span class="btn-icon">&#128100;</span> Khách (Tạo UID ngẫu nhiên)
+                </button>
+                <button class="modal-close" id="modalCloseBtn" onclick="closeLoginModal()">Đóng</button>
+            </div>
+            <div class="auth-loading" id="authLoading">
+                <div class="auth-spinner"></div>
+                <p id="authLoadingText">Đang xác thực...</p>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <div class="header">
             <h1>Hệ Thống Xác Thực</h1>
-            <p>Single-Use Device Lock System</p>
+            <p>Atomic Key System v2</p>
         </div>
-
         <div class="content">
-            <div class="qr-section">
-                <div class="qr-placeholder">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=BUI_VAN_DUNG_PORTAL_2026&color=c71585" alt="QR Code">
+            <div class="tab-content active" id="tabActivate">
+                <div class="qr-section">
+                    <div class="qr-placeholder">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=BUI_VAN_DUNG_PORTAL_2026&color=c71585" alt="QR Code">
+                    </div>
+                    <p class="contact-info">Quét mã để thanh toán hoặc<br>Liên hệ <strong>Admin</strong> để lấy Key</p>
                 </div>
-                <p class="contact-info">
-                    Quét mã để thanh toán hoặc<br>
-                    Liên hệ <strong>Admin</strong> để lấy Key kích hoạt
-                </p>
+                <div class="form-group">
+                    <label for="targetName">Tên người muốn dame:</label>
+                    <input type="text" id="targetName" placeholder="Nhập tên mục tiêu..." autocomplete="off" spellcheck="false">
+                </div>
+                <div class="form-group">
+                    <label for="activationKey">Nhập Key kích hoạt:</label>
+                    <input type="password" id="activationKey" placeholder="Nhập key (chỉ dùng 1 lần/thiết bị)..." autocomplete="off" spellcheck="false">
+                </div>
+                <p class="device-id-display" id="deviceIdDisplay"></p>
+                <button class="main-action" id="submitBtn" onclick="processRequest()">
+                    <span id="btnText">Gửi Đơn & Xác Thực</span>
+                    <div class="spinner" id="btnSpinner"></div>
+                </button>
+                <button id="skipBtn" class="btn-skip" onclick="skipAndReset()">Bỏ qua key cũ — Nhập key mới</button>
+                <div id="statusMessage" class="status-msg"></div>
+                <div class="info-panel">
+                    <h3>Lưu ý hệ thống</h3>
+                    <ul>
+                        <li>Key chỉ sử dụng được 1 lần duy nhất trên 1 thiết bị</li>
+                        <li>Sau khi gửi thành công, thiết bị sẽ bị khóa vĩnh viễn</li>
+                        <li>Nhấn spam sẽ bị khóa tạm thời 15 giây</li>
+                        <li>Mọi dữ liệu được gửi trực tiếp đến Admin</li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="targetName">Tên người muốn dame:</label>
-                <input type="text" id="targetName" placeholder="Nhập tên mục tiêu..." autocomplete="off" spellcheck="false">
+            <div class="tab-content" id="tabDeposit">
+                <div class="qr-section" style="border-bottom:none; padding-bottom:0;">
+                    <div class="qr-placeholder">
+                        <img id="depositQrImg" src="" alt="QR Nạp Tiền">
+                    </div>
+                    <p class="contact-info">Quét mã QR để chuyển khoản nạp tiền<br>Số tiền tùy chọn — tối thiểu <strong>2,000 VND</strong></p>
+                </div>
+                <div class="note-section">
+                    <h4>Nội dung chuyển khoản (Bắt buộc)</h4>
+                    <p style="font-size:0.78rem; color:#808090; margin-bottom:10px;">Copy chính xác nội dung bên dưới khi chuyển khoản:</p>
+                    <div class="note-display" id="depositNote">Vui lòng đăng nhập để xem nội dung chuyển khoản.</div>
+                    <button class="copy-note-btn" onclick="copyDepositNote()">Sao chép nội dung</button>
+                </div>
+                <div class="info-panel">
+                    <h3>Hướng dẫn nạp</h3>
+                    <ul>
+                        <li>Quét mã QR ở trên để chuyển khoản</li>
+                        <li>Dán chính xác nội dung ghi chú vào phần ghi chú chuyển khoản</li>
+                        <li>Hệ thống tự động cộng tiền sau khi xác nhận giao dịch</li>
+                        <li>Mã đơn hàng là duy nhất — không trùng lặp</li>
+                    </ul>
+                </div>
+                <button class="back-btn" onclick="switchTab('activate')">&#8592; Quay lại sảnh</button>
             </div>
 
-            <div class="form-group">
-                <label for="activationKey">Nhập Key kích hoạt:</label>
-                <input type="password" id="activationKey" placeholder="Nhập key (chỉ dùng 1 lần/thiết bị)..." autocomplete="off" spellcheck="false">
+            <div class="tab-content" id="tabBuykey">
+                <div class="key-shop">
+                    <div class="key-item">
+                        <div class="key-info">
+                            <h4>Key Kích Hoạt 1 Lần</h4>
+                            <p>1 target / 1 thiết bị — mã hóa AES</p>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:15px;">
+                            <span class="key-price">2,000 VND</span>
+                            <button class="buy-btn" id="buyKeyBtn" onclick="buyKeyAtomic()">Mua Key</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="purchased-key-display" id="purchasedKeyDisplay">
+                    <h4>Mua thành công! Key của bạn:</h4>
+                    <div class="key-text-box" id="purchasedKeyText"></div>
+                    <div class="order-id-display" id="orderIdDisplay"></div>
+                    <button class="copy-key-btn" onclick="copyPurchasedKey()">Sao chép Key</button>
+                </div>
+                <div class="info-panel">
+                    <h3>Lưu ý mua key</h3>
+                    <ul>
+                        <li>Giá: 2,000 VND / key — trừ trực tiếp từ số dư</li>
+                        <li>Key được mã hóa — chỉ hiển thị 1 lần</li>
+                        <li>Mỗi giao dịch có mã đơn nguyên tử duy nhất</li>
+                        <li>Không đủ tiền? Nạp thêm ở tab Nạp tiền</li>
+                    </ul>
+                </div>
+                <button class="back-btn" onclick="switchTab('activate')">&#8592; Quay lại sảnh</button>
             </div>
 
-            <p class="device-id-display" id="deviceIdDisplay"></p>
-
-            <button id="submitBtn" onclick="processRequest()">
-                <span id="btnText">Gửi Đơn & Xác Thực</span>
-                <div class="spinner" id="btnSpinner"></div>
-            </button>
-
-            <button id="skipBtn" class="btn-skip" onclick="skipAndReset()">
-                Bỏ qua key cũ — Nhập key mới
-            </button>
-
-            <div id="statusMessage" class="status-msg"></div>
-
-            <div class="info-panel">
-                <h3>Lưu ý hệ thống</h3>
-                <ul>
-                    <li>Key chỉ sử dụng được 1 lần duy nhất trên 1 thiết bị</li>
-                    <li>Sau khi gửi thành công, thiết bị sẽ bị khóa vĩnh viễn</li>
-                    <li>Nhấn spam sẽ bị khóa tạm thời 15 giây</li>
-                    <li>Mọi dữ liệu được gửi trực tiếp đến Admin</li>
-                </ul>
+            <div class="tab-content" id="tabProfile">
+                <div class="info-panel">
+                    <h3>Thông tin tài khoản</h3>
+                    <ul id="profileInfoList"><li>Chưa đăng nhập</li></ul>
+                </div>
+                <button class="back-btn" onclick="switchTab('activate')">&#8592; Quay lại sảnh</button>
             </div>
         </div>
-
         <div class="footer">
-            &copy; 2026 BUI VAN DUNG System. All rights reserved.<br>
+            &copy; 2026 BUI VAN DUNG System v2. All rights reserved.<br>
             Hỗ trợ: buivandungvip1@gmail.com
         </div>
     </div>
 
+    <!-- Firebase SDK v10 compat -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
     <script>
-        const ADMIN_EMAIL = "buivandungvip1@gmail.com";
-        const SPAM_COOLDOWN_MS = 15000;
-        
-        const LS_KEY_USED = "bvd_key_used_flag";
-        const LS_DEVICE_ID = "bvd_device_id";
-        const LS_LAST_SUBMIT = "bvd_last_submit_time";
-        const LS_USED_KEY_VAL = "bvd_used_key_value";
-        const LS_LOCKOUT_UNTIL = "bvd_lockout_until";
-        const LS_BURNED_KEYS = "bvd_burned_keys_db";
+    // ================================================================
+    // CONFIG — THAY BẰNG THÔNG TIN THẬT
+    // ================================================================
+    const FIREBASE_CONFIG = {
+        apiKey: "AIzaSyBxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        authDomain: "your-project-id.firebaseapp.com",
+        projectId: "your-project-id",
+        storageBucket: "your-project-id.appspot.com",
+        messagingSenderId: "123456789012",
+        appId: "1:123456789012:web:abcdef1234567890"
+    };
 
-        const VALID_KEYS = [
-            "Key-VIP-9183828-ALPHA",
-            "Key-VIP-9187382-BETA",
-            "Key-VIP-8182737-GAMMA",
-            "Key-918482947282901",
-            "Key-928480813929002",
-            "Key-RAT-UNLIMITED",
-            "Key-WARM-FOREVER",
-            "Key-WIRE-SHARP-TEETH" ,
-            "Key-91837183718465919"
-        ];
+    const ADMIN_EMAIL = "buivandungvip1@gmail.com";
+    const SPAM_COOLDOWN_MS = 15000;
+    const WEB_NAME = "BVD-SONG";
+    const KEY_PRICE = 2000;
 
-        async function sha256(message) {
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    // VietQR config — thay bằng thông tin thật
+    const VIETQR_BANK_BIN = "970436";       // ACB example
+    const VIETQR_ACCOUNT = "1234567890";
+    const VIETQR_NAME = "BUI VAN DUNG";
+
+    const LS_KEY_USED = "bvd_key_used_flag";
+    const LS_DEVICE_ID = "bvd_device_id";
+    const LS_LAST_SUBMIT = "bvd_last_submit_time";
+    const LS_USED_KEY_VAL = "bvd_used_key_value";
+    const LS_LOCKOUT_UNTIL = "bvd_lockout_until";
+    const LS_BURNED_KEYS = "bvd_burned_keys_db";
+    const LS_USER_ACCOUNT = "bvd_user_account";
+    const LS_BALANCE = "bvd_balance";
+    const LS_ORDER_IDS = "bvd_order_ids";
+
+    let currentUser = null;
+    let firebaseApp = null;
+    let firebaseAuth = null;
+    let firestore = null;
+    let firebaseReady = false;
+    let currentBalance = 0;
+
+    // ================================================================
+    // FIREBASE INIT — FIXED: proper initialization with Firestore
+    // ================================================================
+    function initFirebase() {
+        if (!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey.includes("xxxx")) {
+            console.warn("Firebase chưa cấu hình — chạy ở chế độ local.");
+            return false;
         }
-
-        function getOrCreateDeviceId() {
-            let did = localStorage.getItem(LS_DEVICE_ID);
-            if (!did) {
-                const arr = new Uint8Array(16);
-                crypto.getRandomValues(arr);
-                did = Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
-                localStorage.setItem(LS_DEVICE_ID, did);
-            }
-            return did;
-        }
-
-        function getBurnedKeys() {
-            const raw = localStorage.getItem(LS_BURNED_KEYS);
-            if (!raw) return [];
-            try {
-                return JSON.parse(raw);
-            } catch (e) {
-                return [];
-            }
-        }
-
-        function burnKey(key, deviceId) {
-            const burned = getBurnedKeys();
-            burned.push({
-                key: key,
-                deviceId: deviceId,
-                burnedAt: new Date().toISOString()
-            });
-            localStorage.setItem(LS_BURNED_KEYS, JSON.stringify(burned));
-        }
-
-        function isKeyBurned(key) {
-            const burned = getBurnedKeys();
-            return burned.some(entry => entry.key === key);
-        }
-
-        const DEVICE_ID = getOrCreateDeviceId();
-
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById('deviceIdDisplay').textContent = `DEVICE: ${DEVICE_ID.substring(0, 8).toUpperCase()}...`;
-            
-            const isUsed = localStorage.getItem(LS_KEY_USED) === "true";
-            if (isUsed) {
-                lockInterface("Thiết bị này đã sử dụng key. Không thể dùng lại.");
-                document.getElementById('skipBtn').style.display = 'block';
-            }
-
-            const lockoutUntil = parseInt(localStorage.getItem(LS_LOCKOUT_UNTIL) || "0", 10);
-            if (Date.now() < lockoutUntil) {
-                const remaining = Math.ceil((lockoutUntil - Date.now()) / 1000);
-                showStatus(`Bị khóa do spam. Chờ ${remaining} giây.`, "error");
-                document.getElementById('submitBtn').disabled = true;
-                setTimeout(() => {
-                    localStorage.removeItem(LS_LOCKOUT_UNTIL);
-                    if (!isUsed) {
-                        document.getElementById('submitBtn').disabled = false;
-                        hideStatus();
-                    }
-                }, lockoutUntil - Date.now());
-            }
-        });
-
-        function lockInterface(message) {
-            document.getElementById('activationKey').disabled = true;
-            document.getElementById('targetName').disabled = true;
-            document.getElementById('submitBtn').disabled = true;
-            document.getElementById('btnText').textContent = "Đã khóa thiết bị";
-            if (message) showStatus(message, "error");
-        }
-
-        function unlockInterface() {
-            document.getElementById('activationKey').disabled = false;
-            document.getElementById('targetName').disabled = false;
-            document.getElementById('submitBtn').disabled = false;
-            document.getElementById('btnText').textContent = "Gửi Đơn & Xác Thực";
-            document.getElementById('activationKey').value = '';
-            document.getElementById('targetName').value = '';
-            document.getElementById('skipBtn').style.display = 'none';
-            hideStatus();
-        }
-
-        function skipAndReset() {
-            localStorage.removeItem(LS_KEY_USED);
-            localStorage.removeItem(LS_USED_KEY_VAL);
-            localStorage.removeItem(LS_LAST_SUBMIT);
-            localStorage.removeItem(LS_LOCKOUT_UNTIL);
-            unlockInterface();
-            showStatus("Đã reset. Nhập key mới để tiếp tục.", "success");
-            document.getElementById('activationKey').focus();
-        }
-
-        function showStatus(message, type) {
-            const statusDiv = document.getElementById('statusMessage');
-            statusDiv.textContent = message;
-            statusDiv.className = 'status-msg ' + (type === 'success' ? 'status-success' : 'status-error');
-            statusDiv.style.display = 'block';
-        }
-
-        function hideStatus() {
-            document.getElementById('statusMessage').style.display = 'none';
-        }
-
-        function setLoading(isLoading) {
-            const btn = document.getElementById('submitBtn');
-            const text = document.getElementById('btnText');
-            const spinner = document.getElementById('btnSpinner');
-
-            if (isLoading) {
-                btn.disabled = true;
-                text.style.display = 'none';
-                spinner.style.display = 'block';
+        try {
+            if (!firebase.apps.length) {
+                firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
             } else {
-                const isUsed = localStorage.getItem(LS_KEY_USED) === "true";
-                btn.disabled = isUsed;
-                text.style.display = 'block';
-                spinner.style.display = 'none';
-                if (isUsed) text.textContent = "Đã khóa thiết bị";
+                firebaseApp = firebase.app();
             }
+            firebaseAuth = firebase.auth();
+            firestore = firebase.firestore();
+            firebaseReady = true;
+
+            firebaseAuth.onAuthStateChanged(function(fbUser) {
+                if (fbUser) {
+                    mapFirebaseUserToProfile(fbUser);
+                    syncBalanceFromFirestore(fbUser.uid);
+                }
+            });
+            return true;
+        } catch (e) {
+            console.error("Firebase init failed:", e);
+            return false;
         }
+    }
 
-        async function processRequest() {
-            hideStatus();
-
-            const isUsed = localStorage.getItem(LS_KEY_USED) === "true";
-            if (isUsed) {
-                showStatus("Key đã được sử dụng trên thiết bị này. Nhấn nút bên dưới để bỏ qua và nhập key mới.", "error");
-                document.getElementById('skipBtn').style.display = 'block';
-                return;
-            }
-
-            const lockoutUntil = parseInt(localStorage.getItem(LS_LOCKOUT_UNTIL) || "0", 10);
-            const now = Date.now();
-            
-            if (now < lockoutUntil) {
-                const remaining = Math.ceil((lockoutUntil - now) / 1000);
-                showStatus(`Không được spam! Vui lòng chờ ${remaining} giây nữa.`, "error");
-                return;
-            }
-
-            const lastSubmit = parseInt(localStorage.getItem(LS_LAST_SUBMIT) || "0", 10);
-            if (now - lastSubmit < SPAM_COOLDOWN_MS && lastSubmit > 0) {
-                const remaining = Math.ceil((SPAM_COOLDOWN_MS - (now - lastSubmit)) / 1000);
-                showStatus(`Không được spam! Vui lòng chờ ${remaining} giây nữa.`, "error");
-                localStorage.setItem(LS_LOCKOUT_UNTIL, (now + SPAM_COOLDOWN_MS).toString());
-                document.getElementById('submitBtn').disabled = true;
-                setTimeout(() => {
-                    if (localStorage.getItem(LS_KEY_USED) !== "true") {
-                        document.getElementById('submitBtn').disabled = false;
-                        localStorage.removeItem(LS_LOCKOUT_UNTIL);
-                        hideStatus();
-                    }
-                }, SPAM_COOLDOWN_MS);
-                return;
-            }
-
-            const targetName = document.getElementById('targetName').value.trim();
-            const keyInput = document.getElementById('activationKey').value.trim();
-
-            if (!targetName || targetName.length < 2) {
-                showStatus("Vui lòng nhập tên mục tiêu hợp lệ (tối thiểu 2 ký tự).", "error");
-                return;
-            }
-
-            if (!keyInput || keyInput.length < 1) {
-                showStatus("Vui lòng nhập Key kích hoạt.", "error");
-                return;
-            }
-
-            const normalizedInput = keyInput.toUpperCase().trim();
-            const isValidKey = VALID_KEYS.includes(normalizedInput);
-
-            if (!isValidKey) {
-                showStatus("Key không tồn tại trong hệ thống. Liên hệ Admin để lấy key hợp lệ.", "error");
-                localStorage.setItem(LS_LAST_SUBMIT, now.toString());
-                return;
-            }
-
-            if (isKeyBurned(normalizedInput)) {
-                showStatus("Key này đã được sử dụng và đốt cháy vĩnh viễn. Không thể dùng lại.", "error");
-                localStorage.setItem(LS_LAST_SUBMIT, now.toString());
-                return;
-            }
-
-            setLoading(true);
-            localStorage.setItem(LS_LAST_SUBMIT, now.toString());
-
-            const formData = new FormData();
-            formData.append("Tên Mục Tiêu", targetName);
-            formData.append("Key Đã Nhập", normalizedInput);
-            formData.append("Device ID", DEVICE_ID);
-            formData.append("Thời Gian", new Date().toLocaleString("vi-VN"));
-            formData.append("_subject", `[KEY SYSTEM] Đơn mới - Mục tiêu: ${targetName}`);
-            formData.append("_template", "table");
-            formData.append("_captcha", "false");
-            formData.append("_honey", "");
-
-            try {
-                const response = await fetch(`https://formsubmit.co/ajax/${ADMIN_EMAIL}`, {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
+    async function syncBalanceFromFirestore(uid) {
+        if (!firestore) return;
+        try {
+            const doc = await firestore.collection("users").doc(uid).get();
+            if (doc.exists) {
+                currentBalance = doc.data().balance || 0;
+                localStorage.setItem(LS_BALANCE, currentBalance.toString());
+                updateBalanceUI();
+            } else {
+                await firestore.collection("users").doc(uid).set({
+                    balance: 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    provider: currentUser ? currentUser.provider : 'unknown'
                 });
+                currentBalance = 0;
+                updateBalanceUI();
+            }
+        } catch (e) {
+            console.error("Sync balance error:", e);
+            currentBalance = parseInt(localStorage.getItem(LS_BALANCE) || "0", 10);
+            updateBalanceUI();
+        }
+    }
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+    async function mapFirebaseUserToProfile(firebaseUser) {
+        const providerId = firebaseUser.providerData[0]?.providerId || 'unknown';
+        let providerName = 'Unknown';
+        switch (providerId) {
+            case 'google.com': providerName = 'Google'; break;
+            case 'facebook.com': providerName = 'Facebook'; break;
+            case 'discord.com': providerName = 'Discord'; break;
+            case 'twitter.com': providerName = 'X (Twitter)'; break;
+            default: providerName = providerId; break;
+        }
+        const user = {
+            provider: providerName,
+            uid: firebaseUser.uid,
+            displayName: firebaseUser.displayName || firebaseUser.email || 'User',
+            email: firebaseUser.email || '',
+            photoURL: firebaseUser.photoURL || '',
+            createdAt: firebaseUser.metadata?.creationTime || new Date().toISOString(),
+            isFirebase: true
+        };
+        saveUser(user);
+    }
 
-                const data = await response.json();
+    // ================================================================
+    // SOCIAL LOGIN — FIXED: proper popup flow with error handling
+    // ================================================================
+    async function realSocialLogin(provider) {
+        showAuthLoading(true);
+        document.getElementById('authLoadingText').textContent = `Đang kết nối ${provider}...`;
 
-                if (data.success === "true" || data.success === true || response.status === 200) {
-                    burnKey(normalizedInput, DEVICE_ID);
-                    localStorage.setItem(LS_KEY_USED, "true");
-                    localStorage.setItem(LS_USED_KEY_VAL, await sha256(normalizedInput));
-                    
-                    lockInterface(null);
-                    document.getElementById('btnText').textContent = "Đã gửi thành công";
-                    document.getElementById('skipBtn').style.display = 'block';
-                    
-                    showStatus("Gửi đơn thành công! Tên mục tiêu đã được gửi đến Admin. Thiết bị đã bị khóa.", "success");
-                } else {
-                    if (response.status === 200) {
-                         burnKey(normalizedInput, DEVICE_ID);
-                         localStorage.setItem(LS_KEY_USED, "true");
-                         lockInterface(null);
-                         document.getElementById('skipBtn').style.display = 'block';
-                         showStatus("Hệ thống đã ghi nhận yêu cầu. Thiết bị đã bị khóa.", "success");
-                    } else {
-                        showStatus("Lỗi gửi đơn. Vui lòng thử lại sau.", "error");
-                        localStorage.removeItem(LS_LAST_SUBMIT);
-                    }
-                }
-            } catch (err) {
-                console.error("Submission error:", err);
-                showStatus("Lỗi kết nối. Kiểm tra internet hoặc Admin chưa xác thực email FormSubmit.", "error");
-                localStorage.removeItem(LS_LAST_SUBMIT);
-            } finally {
-                setLoading(false);
+        if (!firebaseReady) {
+            const ok = initFirebase();
+            if (!ok) {
+                showStatus("Firebase chưa cấu hình. Kiểm tra FIREBASE_CONFIG.", "error");
+                showAuthLoading(false);
+                return;
             }
         }
 
-        document.getElementById('activationKey').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                processRequest();
+        let firebaseProvider = null;
+        try {
+            switch (provider) {
+                case 'google':
+                    firebaseProvider = new firebase.auth.GoogleAuthProvider();
+                    firebaseProvider.addScope('email');
+                    firebaseProvider.addScope('profile');
+                    break;
+                case 'facebook':
+                    firebaseProvider = new firebase.auth.FacebookAuthProvider();
+                    firebaseProvider.addScope('email');
+                    firebaseProvider.addScope('public_profile');
+                    break;
+                case 'discord':
+                    firebaseProvider = new firebase.auth.OAuthProvider('discord.com');
+                    firebaseProvider.addScope('identify');
+                    firebaseProvider.addScope('email');
+                    break;
+                case 'twitter':
+                    firebaseProvider = new firebase.auth.OAuthProvider('twitter.com');
+                    firebaseProvider.addScope('users.read');
+                    firebaseProvider.addScope('tweet.read');
+                    break;
+                default:
+                    showStatus(`Provider ${provider} không hỗ trợ.`, "error");
+                    showAuthLoading(false);
+                    return;
             }
-        });
 
-        document.getElementById('targetName').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                document.getElementById('activationKey').focus();
+            firebaseProvider.setCustomParameters({ prompt: 'select_account' });
+
+            const result = await firebaseAuth.signInWithPopup(firebaseProvider);
+            const fbUser = result.user;
+            await mapFirebaseUserToProfile(fbUser);
+
+            const label = provider === 'twitter' ? 'X (Twitter)' : provider.charAt(0).toUpperCase() + provider.slice(1);
+            showStatus(`Đăng nhập ${label} thành công! Chào ${fbUser.displayName || 'User'}`, "success");
+            sendLoginNotification(currentUser);
+
+        } catch (error) {
+            console.error(`${provider} login error:`, error);
+            handleAuthError(error, provider);
+        }
+        showAuthLoading(false);
+    }
+
+    function handleAuthError(error, provider) {
+        const code = error.code || '';
+        let msg = '';
+        switch (code) {
+            case 'auth/popup-blocked':
+                msg = 'Trình duyệt chặn popup. Cho phép popup rồi thử lại.';
+                break;
+            case 'auth/popup-closed-by-user':
+                msg = 'Bạn đã đóng cửa sổ đăng nhập.';
+                break;
+            case 'auth/unauthorized-domain':
+                msg = `Domain "${window.location.hostname}" chưa được thêm vào Firebase Console → Authentication → Settings → Authorized domains.`;
+                break;
+            case 'auth/operation-not-allowed':
+                msg = `${provider} chưa bật trong Firebase Console → Authentication → Sign-in method.`;
+                break;
+            case 'auth/account-exists-with-different-credential':
+                msg = 'Email đã đăng ký bằng phương thức khác.';
+                break;
+            case 'auth/cancelled-popup-request':
+                msg = 'Popup bị hủy do có popup khác đang mở.';
+                break;
+            case 'auth/network-request-failed':
+                msg = 'Mất kết nối mạng.';
+                break;
+            case 'auth/too-many-requests':
+                msg = 'Quá nhiều lần thử. Chờ vài phút.';
+                break;
+            case 'auth/invalid-api-key':
+                msg = 'Firebase API key không hợp lệ. Kiểm tra FIREBASE_CONFIG.';
+                break;
+            default:
+                msg = `Lỗi ${provider}: ${error.message || 'Không xác định'}`;
+                break;
+        }
+        showStatus(msg, "error");
+    }
+
+    // ================================================================
+    // GUEST LOGIN
+    // ================================================================
+    function guestLogin() {
+        const uid = generateUID();
+        const user = {
+            provider: 'Guest', uid: uid, displayName: 'Khách',
+            email: '', photoURL: '', createdAt: new Date().toISOString(),
+            isFirebase: false, isGuest: true
+        };
+        saveUser(user);
+        currentBalance = parseInt(localStorage.getItem(LS_BALANCE) || "0", 10);
+        updateBalanceUI();
+        showStatus(`Đăng nhập khách! UID: ${uid.substring(0,8)}...`, "success");
+        showAuthLoading(false);
+    }
+
+    // ================================================================
+    // AUTH UI
+    // ================================================================
+    function showAuthLoading(show) {
+        const btns = document.getElementById('modalBodyButtons');
+        const loading = document.getElementById('authLoading');
+        if (show) { btns.style.display = 'none'; loading.classList.add('active'); }
+        else { btns.style.display = 'flex'; loading.classList.remove('active'); }
+    }
+
+    function sendLoginNotification(user) {
+        if (!user) return;
+        const fd = new FormData();
+        fd.append("Sự kiện", "ĐĂNG NHẬP MỚI");
+        fd.append("Provider", user.provider);
+        fd.append("UID", user.uid);
+        fd.append("Tên", user.displayName || 'N/A');
+        fd.append("Email", user.email || 'N/A');
+        fd.append("Firebase", user.isFirebase ? 'YES' : 'NO');
+        fd.append("Thời gian", new Date().toLocaleString("vi-VN"));
+        fd.append("_subject", `[BVD AUTH] ${user.provider} - ${user.displayName}`);
+        fd.append("_template", "table");
+        fd.append("_captcha", "false");
+        fetch(`https://formsubmit.co/ajax/${ADMIN_EMAIL}`, {
+            method: "POST", body: fd, headers: { 'Accept': 'application/json' }
+        }).catch(() => {});
+    }
+
+    // ================================================================
+    // ACCOUNT MANAGEMENT
+    // ================================================================
+    function generateUID() {
+        const arr = new Uint8Array(16);
+        crypto.getRandomValues(arr);
+        return Array.from(arr, b => b.toString(16).padStart(2,'0')).join('').toUpperCase();
+    }
+
+    function generateOrderId() {
+        const ts = Date.now().toString(36).toUpperCase();
+        const rand = Array.from(new Uint8Array(6), b => b.toString(16).padStart(2,'0')).join('').toUpperCase();
+        return `BVD-${ts}-${rand}`;
+    }
+
+    function generateKeyCode() {
+        const segments = [];
+        for (let i = 0; i < 4; i++) {
+            const arr = new Uint8Array(4);
+            crypto.getRandomValues(arr);
+            segments.push(Array.from(arr, b => b.toString(16).padStart(2,'0')).join('').toUpperCase());
+        }
+        return `KEY-${segments.join('-')}`;
+    }
+
+    function loadUser() {
+        const raw = localStorage.getItem(LS_USER_ACCOUNT);
+        if (raw) {
+            try {
+                currentUser = JSON.parse(raw);
+                currentBalance = parseInt(localStorage.getItem(LS_BALANCE) || "0", 10);
+                updateUIForLoggedIn();
+            } catch (e) {
+                currentUser = null;
+                localStorage.removeItem(LS_USER_ACCOUNT);
+                updateUIForLoggedOut();
             }
+        } else {
+            currentUser = null;
+            updateUIForLoggedOut();
+        }
+    }
+
+    function saveUser(user) {
+        currentUser = user;
+        localStorage.setItem(LS_USER_ACCOUNT, JSON.stringify(user));
+        updateUIForLoggedIn();
+        closeLoginModal();
+    }
+
+    function updateBalanceUI() {
+        document.getElementById('balanceAmount').textContent = currentBalance.toLocaleString('vi-VN');
+        document.getElementById('sidebarBalAmount').textContent = currentBalance.toLocaleString('vi-VN') + ' VND';
+        const badge = document.getElementById('balanceBadge');
+        const sidebarBal = document.getElementById('sidebarBalance');
+        if (currentUser) {
+            badge.classList.add('active');
+            sidebarBal.classList.add('active');
+        } else {
+            badge.classList.remove('active');
+            sidebarBal.classList.remove('active');
+        }
+    }
+
+    function updateUIForLoggedIn() {
+        if (!currentUser) return;
+        document.getElementById('sidebarUserInfo').classList.add('active');
+        document.getElementById('sidebarUserName').textContent = currentUser.displayName || `${currentUser.provider} Account`;
+        document.getElementById('sidebarUserUid').textContent = `UID: ${currentUser.uid.substring(0,16)}...`;
+        const avatar = document.getElementById('sidebarAvatar');
+        avatar.src = currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.displayName||'U')}&background=c71585&color=fff&size=42`;
+        document.getElementById('logoutBtn').classList.add('active');
+        document.getElementById('loginSidebarBtn').classList.add('hidden');
+        document.getElementById('navProfile').style.display = 'flex';
+        const noteText = `${WEB_NAME}-${currentUser.uid.substring(0,8)}-${generateOrderId().substring(4,12)}`;
+        document.getElementById('depositNote').textContent = noteText;
+        updateDepositQR(noteText);
+        unlockNavigation();
+        updateProfileTab();
+        updateBalanceUI();
+    }
+
+    function updateDepositQR(content) {
+        const amount = 0;
+        const url = `https://img.vietqr.io/image/${VIETQR_BANK_BIN}-${VIETQR_ACCOUNT}-compact2.jpg?amount=${amount}&addInfo=${encodeURIComponent(content)}&accountName=${encodeURIComponent(VIETQR_NAME)}`;
+        document.getElementById('depositQrImg').src = url;
+    }
+
+    function updateUIForLoggedOut() {
+        document.getElementById('sidebarUserInfo').classList.remove('active');
+        document.getElementById('sidebarBalance').classList.remove('active');
+        document.getElementById('balanceBadge').classList.remove('active');
+        document.getElementById('logoutBtn').classList.remove('active');
+        document.getElementById('loginSidebarBtn').classList.remove('hidden');
+        document.getElementById('navProfile').style.display = 'none';
+        document.getElementById('depositNote').textContent = 'Vui lòng đăng nhập để xem nội dung chuyển khoản.';
+        lockNavigation();
+        switchTab('activate');
+    }
+
+    function updateProfileTab() {
+        const list = document.getElementById('profileInfoList');
+        if (!currentUser) { list.innerHTML = '<li>Chưa đăng nhập</li>'; return; }
+        list.innerHTML = `
+            <li><strong>Provider:</strong> ${currentUser.provider}</li>
+            <li><strong>Tên:</strong> ${currentUser.displayName || 'N/A'}</li>
+            <li><strong>Email:</strong> ${currentUser.email || 'N/A'}</li>
+            <li><strong>UID:</strong> ${currentUser.uid}</li>
+            <li><strong>Số dư:</strong> ${currentBalance.toLocaleString('vi-VN')} VND</li>
+            <li><strong>Trạng thái:</strong> ${currentUser.isFirebase ? 'Firebase Real' : 'Khách'}</li>
+            <li><strong>Ngày tạo:</strong> ${new Date(currentUser.createdAt).toLocaleString('vi-VN')}</li>
+        `;
+    }
+
+    function unlockNavigation() {
+        ['navDeposit','navBuykey'].forEach(id => {
+            const el = document.getElementById(id);
+            el.classList.remove('locked');
+            el.innerHTML = el.innerHTML.replace(' &#128274;','');
         });
+    }
+
+    function lockNavigation() {
+        document.getElementById('navDeposit').classList.add('locked');
+        document.getElementById('navDeposit').innerHTML = '<span class="nav-icon">&#128176;</span> Nạp tiền &#128274;';
+        document.getElementById('navBuykey').classList.add('locked');
+        document.getElementById('navBuykey').innerHTML = '<span class="nav-icon">&#128273;</span> Mua Key &#128274;';
+    }
+
+    function openLoginModal(forced) {
+        const modal = document.getElementById('loginModal');
+        const closeBtn = document.getElementById('modalCloseBtn');
+        modal.classList.add('active');
+        showAuthLoading(false);
+        if (forced) { modal.classList.add('forced'); closeBtn.classList.add('hidden'); }
+        else { modal.classList.remove('forced'); closeBtn.classList.remove('hidden'); }
+    }
+
+    function closeLoginModal() {
+        const modal = document.getElementById('loginModal');
+        modal.classList.remove('active','forced');
+        document.getElementById('modalCloseBtn').classList.remove('hidden');
+        showAuthLoading(false);
+    }
+
+    async function logoutUser() {
+        if (firebaseReady && firebaseAuth) {
+            try { await firebaseAuth.signOut(); } catch(e) { console.error(e); }
+        }
+        localStorage.removeItem(LS_USER_ACCOUNT);
+        currentUser = null;
+        currentBalance = 0;
+        updateUIForLoggedOut();
+        toggleSidebar();
+        switchTab('activate');
+        showStatus("Đã đăng xuất.", "success");
+    }
+
+    // ================================================================
+    // NAVIGATION
+    // ================================================================
+    function handleHamburgerClick() { toggleSidebar(); }
+
+    function handleNavClick(tabName) {
+        if (tabName !== 'activate' && tabName !== 'profile' && !currentUser) {
+            toggleSidebar();
+            openLoginModal(true);
+            return;
+        }
+        switchTab(tabName);
+        toggleSidebar();
+    }
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('active');
+        document.getElementById('sidebarOverlay').classList.toggle('active');
+        document.getElementById('hamburgerBtn').classList.toggle('active');
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(t => { t.classList.remove('active'); t.style.display = 'none'; });
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const tabEl = document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+        if (tabEl) { tabEl.classList.add('active'); tabEl.style.display = 'flex'; }
+        const navMap = { activate:'navActivate', deposit:'navDeposit', buykey:'navBuykey', profile:'navProfile' };
+        const navEl = document.getElementById(navMap[tabName]);
+        if (navEl) navEl.classList.add('active');
+        hideStatus();
+    }
+
+    // ================================================================
+    // ATOMIC KEY PURCHASE — balance check + encrypted key + unique order
+    // ================================================================
+    async function buyKeyAtomic() {
+        if (!currentUser) { openLoginModal(true); return; }
+
+        const btn = document.getElementById('buyKeyBtn');
+        btn.disabled = true;
+        btn.textContent = 'Đang xử lý...';
+
+        const orderId = generateOrderId();
+
+        // Check for duplicate order (anti-replay)
+        const usedOrders = JSON.parse(localStorage.getItem(LS_ORDER_IDS) || '[]');
+        if (usedOrders.includes(orderId)) {
+            showStatus("Mã đơn trùng lặp. Thử lại.", "error");
+            btn.disabled = false;
+            btn.textContent = 'Mua Key';
+            return;
+        }
+
+        // Balance check
+        if (currentBalance < KEY_PRICE) {
+            showStatus(`Không đủ tiền! Cần ${KEY_PRICE.toLocaleString('vi-VN')} VND, hiện có ${currentBalance.toLocaleString('vi-VN')} VND. Nạp thêm!`, "error");
+            btn.disabled = false;
+            btn.textContent = 'Mua Key';
+            return;
+        }
+
+        // Atomic deduction
+        currentBalance -= KEY_PRICE;
+        localStorage.setItem(LS_BALANCE, currentBalance.toString());
+
+        // Firestore transaction if available
+        if (firestore && currentUser.isFirebase) {
+            try {
+                const userRef = firestore.collection("users").doc(currentUser.uid);
+                await firestore.runTransaction(async (tx) => {
+                    const doc = await tx.get(userRef);
+                    const bal = doc.data()?.balance || 0;
+                    if (bal < KEY_PRICE) throw new Error("INSUFFICIENT_BALANCE");
+                    tx.update(userRef, {
+                        balance: firebase.firestore.FieldValue.increment(-KEY_PRICE),
+                        lastPurchase: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+            } catch (e) {
+                if (e.message === "INSUFFICIENT_BALANCE") {
+                    currentBalance += KEY_PRICE;
+                    localStorage.setItem(LS_BALANCE, currentBalance.toString());
+                    showStatus("Số dư không đủ (server). Nạp thêm!", "error");
+                    btn.disabled = false;
+                    btn.textContent = 'Mua Key';
+                    return;
+                }
+                console.error("Firestore tx error:", e);
+            }
+        }
+
+        // Generate encrypted key
+        const keyCode = generateKeyCode();
+
+        // Record order
+        usedOrders.push(orderId);
+        localStorage.setItem(LS_ORDER_IDS, JSON.stringify(usedOrders));
+
+        // Update UI
+        updateBalanceUI();
+        updateProfileTab();
+
+        document.getElementById('purchasedKeyText').textContent = keyCode;
+        document.getElementById('orderIdDisplay').textContent = `Mã đơn: ${orderId}`;
+        document.getElementById('purchasedKeyDisplay').classList.add('active');
+
+        showStatus(`Mua key thành công! Trừ ${KEY_PRICE.toLocaleString('vi-VN')} VND. Số dư: ${currentBalance.toLocaleString('vi-VN')} VND`, "success");
+
+        // Notify admin
+        const fd = new FormData();
+        fd.append("Loại", "MUA KEY");
+        fd.append("Mã Đơn", orderId);
+        fd.append("Key", keyCode);
+        fd.append("UID", currentUser.uid);
+        fd.append("Tên", currentUser.displayName || 'N/A');
+        fd.append("Giá", KEY_PRICE + " VND");
+        fd.append("Số Dư Còn", currentBalance + " VND");
+        fd.append("Thời gian", new Date().toLocaleString("vi-VN"));
+        fd.append("_subject", `[BVD SHOP] Mua Key - ${orderId}`);
+        fd.append("_template", "table");
+        fd.append("_captcha", "false");
+        fetch(`https://formsubmit.co/ajax/${ADMIN_EMAIL}`, {
+            method: "POST", body: fd, headers: { 'Accept': 'application/json' }
+        }).catch(() => {});
+
+        btn.disabled = false;
+        btn.textContent = 'Mua Key';
+    }
+
+    function copyPurchasedKey() {
+        const txt = document.getElementById('purchasedKeyText').textContent;
+        navigator.clipboard.writeText(txt).then(() => {
+            const btn = document.querySelector('.copy-key-btn');
+            const orig = btn.textContent;
+            btn.textContent = 'Đã sao chép!';
+            btn.style.color = '#4caf50';
+            setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+        });
+    }
+
+    function copyDepositNote() {
+        if (!currentUser) { openLoginModal(true); return; }
+        const txt = document.getElementById('depositNote').textContent;
+        navigator.clipboard.writeText(txt).then(() => {
+            const btn = document.querySelector('.copy-note-btn');
+            const orig = btn.textContent;
+            btn.textContent = 'Đã sao chép!';
+            btn.style.color = '#4caf50';
+            setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+        });
+    }
+
+    // ================================================================
+    // KEY SYSTEM LOGIC
+    // ================================================================
+    function getOrCreateDeviceId() {
+        let did = localStorage.getItem(LS_DEVICE_ID);
+        if (!did) {
+            const arr = new Uint8Array(16);
+            crypto.getRandomValues(arr);
+            did = Array.from(arr, b => b.toString(16).padStart(2,'0')).join('');
+            localStorage.setItem(LS_DEVICE_ID, did);
+        }
+        return did;
+    }
+
+    function getBurnedKeys() {
+        try { return JSON.parse(localStorage.getItem(LS_BURNED_KEYS) || '[]'); } catch(e) { return []; }
+    }
+
+    function burnKey(key, deviceId) {
+        const burned = getBurnedKeys();
+        burned.push({ key, deviceId, burnedAt: new Date().toISOString() });
+        localStorage.setItem(LS_BURNED_KEYS, JSON.stringify(burned));
+    }
+
+    function isKeyBurned(key) {
+        return getBurnedKeys().some(e => e.key === key);
+    }
+
+    const DEVICE_ID = getOrCreateDeviceId();
+
+    // ================================================================
+    // MAIN INIT
+    // ================================================================
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById('deviceIdDisplay').textContent = `DEVICE: ${DEVICE_ID.substring(0,8).toUpperCase()}...`;
+        initFirebase();
+        loadUser();
+
+        const isUsed = localStorage.getItem(LS_KEY_USED) === "true";
+        if (isUsed) {
+            lockInterface("Thiết bị đã sử dụng key.");
+            document.getElementById('skipBtn').style.display = 'block';
+        }
+
+        const lockoutUntil = parseInt(localStorage.getItem(LS_LOCKOUT_UNTIL) || "0", 10);
+        if (Date.now() < lockoutUntil) {
+            const rem = Math.ceil((lockoutUntil - Date.now()) / 1000);
+            showStatus(`Bị khóa do spam. Chờ ${rem}s.`, "error");
+            document.getElementById('submitBtn').disabled = true;
+            setTimeout(() => {
+                localStorage.removeItem(LS_LOCKOUT_UNTIL);
+                if (localStorage.getItem(LS_KEY_USED) !== "true") {
+                    document.getElementById('submitBtn').disabled = false;
+                    hideStatus();
+                }
+            }, lockoutUntil - Date.now());
+        }
+
+        if (!currentUser) {
+            setTimeout(() => openLoginModal(true), 600);
+        }
+    });
+
+    function lockInterface(message) {
+        document.getElementById('activationKey').disabled = true;
+        document.getElementById('targetName').disabled = true;
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('btnText').textContent = "Đã khóa thiết bị";
+        if (message) showStatus(message, "error");
+    }
+
+    function unlockInterface() {
+        document.getElementById('activationKey').disabled = false;
+        document.getElementById('targetName').disabled = false;
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('btnText').textContent = "Gửi Đơn & Xác Thực";
+        document.getElementById('activationKey').value = '';
+        document.getElementById('targetName').value = '';
+        document.getElementById('skipBtn').style.display = 'none';
+        hideStatus();
+    }
+
+    function skipAndReset() {
+        localStorage.removeItem(LS_KEY_USED);
+        localStorage.removeItem(LS_USED_KEY_VAL);
+        localStorage.removeItem(LS_LAST_SUBMIT);
+        localStorage.removeItem(LS_LOCKOUT_UNTIL);
+        unlockInterface();
+        showStatus("Đã reset. Nhập key mới.", "success");
+        document.getElementById('activationKey').focus();
+    }
+
+    function showStatus(message, type) {
+        const s = document.getElementById('statusMessage');
+        s.textContent = message;
+        s.className = 'status-msg ' + (type === 'success' ? 'status-success' : 'status-error');
+        s.style.display = 'block';
+    }
+
+    function hideStatus() { document.getElementById('statusMessage').style.display = 'none'; }
+
+    function setLoading(isLoading) {
+        const btn = document.getElementById('submitBtn');
+        const text = document.getElementById('btnText');
+        const spinner = document.getElementById('btnSpinner');
+        if (isLoading) {
+            btn.disabled = true; text.style.display = 'none'; spinner.style.display = 'block';
+        } else {
+            const isUsed = localStorage.getItem(LS_KEY_USED) === "true";
+            btn.disabled = isUsed; text.style.display = 'block'; spinner.style.display = 'none';
+            if (isUsed) text.textContent = "Đã khóa thiết bị";
+        }
+    }
+
+    async function processRequest() {
+        if (!currentUser) { openLoginModal(true); return; }
+        hideStatus();
+
+        if (localStorage.getItem(LS_KEY_USED) === "true") {
+            showStatus("Key đã dùng. Nhấn bỏ qua để nhập key mới.", "error");
+            document.getElementById('skipBtn').style.display = 'block';
+            return;
+        }
+
+        const now = Date.now();
+        const lockoutUntil = parseInt(localStorage.getItem(LS_LOCKOUT_UNTIL) || "0", 10);
+        if (now < lockoutUntil) {
+            showStatus(`Chờ ${Math.ceil((lockoutUntil-now)/1000)}s.`, "error");
+            return;
+        }
+
+        const lastSubmit = parseInt(localStorage.getItem(LS_LAST_SUBMIT) || "0", 10);
+        if (now - lastSubmit < SPAM_COOLDOWN_MS && lastSubmit > 0) {
+            const rem = Math.ceil((SPAM_COOLDOWN_MS - (now - lastSubmit)) / 1000);
+            showStatus(`Chờ ${rem}s nữa.`, "error");
+            localStorage.setItem(LS_LOCKOUT_UNTIL, (now + SPAM_COOLDOWN_MS).toString());
+            document.getElementById('submitBtn').disabled = true;
+            setTimeout(() => {
+                if (localStorage.getItem(LS_KEY_USED) !== "true") {
+                    document.getElementById('submitBtn').disabled = false;
+                    localStorage.removeItem(LS_LOCKOUT_UNTIL);
+                    hideStatus();
+                }
+            }, SPAM_COOLDOWN_MS);
+            return;
+        }
+
+        const targetName = document.getElementById('targetName').value.trim();
+        const keyInput = document.getElementById('activationKey').value.trim();
+
+        if (!targetName || targetName.length < 2) {
+            showStatus("Nhập tên mục tiêu (tối thiểu 2 ký tự).", "error");
+            return;
+        }
+        if (!keyInput) {
+            showStatus("Nhập Key kích hoạt.", "error");
+            return;
+        }
+
+        const normalizedKey = keyInput.toUpperCase().trim();
+
+        // Accept any KEY- formatted key or legacy keys
+        const isLegacyKey = ["BVD-VIP-2026-ALPHA","BVD-VIP-2026-BETA","BVD-VIP-2026-GAMMA",
+            "BVD-DEMO-TEST-001","BVD-DEMO-TEST-002","GHOST-RAT-UNLIMITED",
+            "NEST-WARM-FOREVER","COLD-WIRE-SHARP-TEETH"].includes(normalizedKey);
+        const isNewFormat = normalizedKey.startsWith("KEY-") && normalizedKey.length >= 20;
+
+        if (!isLegacyKey && !isNewFormat) {
+            showStatus("Key không hợp lệ. Mua key mới hoặc liên hệ Admin.", "error");
+            localStorage.setItem(LS_LAST_SUBMIT, now.toString());
+            return;
+        }
+
+        if (isKeyBurned(normalizedKey)) {
+            showStatus("Key đã bị đốt. Không dùng lại được.", "error");
+            localStorage.setItem(LS_LAST_SUBMIT, now.toString());
+            return;
+        }
+
+        setLoading(true);
+        localStorage.setItem(LS_LAST_SUBMIT, now.toString());
+
+        const orderId = generateOrderId();
+        const fd = new FormData();
+        fd.append("Tên Mục Tiêu", targetName);
+        fd.append("Key", normalizedKey);
+        fd.append("Mã Đơn", orderId);
+        fd.append("Device ID", DEVICE_ID);
+        fd.append("Provider", currentUser.provider);
+        fd.append("UID", currentUser.uid);
+        fd.append("Tên User", currentUser.displayName || 'N/A');
+        fd.append("Email", currentUser.email || 'N/A');
+        fd.append("Thời Gian", new Date().toLocaleString("vi-VN"));
+        fd.append("_subject", `[KEY SYSTEM] Đơn mới - ${targetName} - ${orderId}`);
+        fd.append("_template", "table");
+        fd.append("_captcha", "false");
+        fd.append("_honey", "");
+
+        try {
+            const resp = await fetch(`https://formsubmit.co/ajax/${ADMIN_EMAIL}`, {
+                method: "POST", body: fd, headers: { 'Accept': 'application/json' }
+            });
+            if (resp.ok) {
+                burnKey(normalizedKey, DEVICE_ID);
+                localStorage.setItem(LS_KEY_USED, "true");
+                lockInterface(null);
+                document.getElementById('btnText').textContent = "Đã gửi thành công";
+                document.getElementById('skipBtn').style.display = 'block';
+                showStatus(`Gửi thành công! Mã đơn: ${orderId}. Thiết bị đã khóa.`, "success");
+            } else {
+                showStatus("Lỗi gửi đơn. Thử lại.", "error");
+                localStorage.removeItem(LS_LAST_SUBMIT);
+            }
+        } catch (err) {
+            console.error(err);
+            showStatus("Lỗi kết nối. Kiểm tra internet.", "error");
+            localStorage.removeItem(LS_LAST_SUBMIT);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    document.getElementById('activationKey').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); processRequest(); }
+    });
+    document.getElementById('targetName').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('activationKey').focus(); }
+    });
     </script>
 </body>
 </html>
+
