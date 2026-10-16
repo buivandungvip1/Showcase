@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Xác Thực & Mua Key BVD</title>
+    <title>Hệ Thống Xác Thực & Mua Key /title>
     <style>
         :root {
             --primary-pink: #ff69b4;
@@ -651,7 +651,7 @@
 
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2>BVD SYSTEM</h2>
+            <h2>SHOP DAME</h2>
             <p>Quản lý tài khoản</p>
         </div>
 
@@ -782,7 +782,7 @@
                 <div class="deposit-card">
                     <h4>Quét mã nạp tiền</h4>
                     <div class="qr-small">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=BVD_PAYMENT_GATEWAY_STK&color=0f3460" alt="QR Bank">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=UID_PAYMENT_GATEWAY_STK&color=0f3460" alt="QR Bank">
                     </div>
                     <p style="font-size: 0.75rem; color: #a0a0b0;">App Ngân hàng bất kỳ</p>
                 </div>
@@ -854,12 +854,12 @@
         };
 
         const ADMIN_EMAIL = "buivandungvip1@gmail.com";
-        const WEB_NAME = "BVD-SONG";
+        const WEB_NAME = "UID-";
 
-        const LS_KEY_USED = "bvd_key_used_flag";
-        const LS_DEVICE_ID = "bvd_device_id";
-        const LS_LAST_SUBMIT = "bvd_last_submit_time";
-        const LS_USER_ACCOUNT = "bvd_user_account";
+        const LS_KEY_USED = "UID_key_used_flag";
+        const LS_DEVICE_ID = "UID_device_id";
+        const LS_LAST_SUBMIT = "UID_last_submit_time";
+        const LS_USER_ACCOUNT = "UID_user_account";
 
         let currentUser = null;
         let firebaseApp = null;
@@ -1114,7 +1114,7 @@
             saveUser(currentUser);
 
             const hashedHex = await sha256(`${currentUser.uid}-${Date.now()}-${Math.random()}`);
-            const secureKey = `BVD-2K-${hashedHex.substring(0, 16).toUpperCase()}`;
+            const secureKey = `UID-2K-${hashedHex.substring(0, 16).toUpperCase()}`;
 
             document.getElementById('purchasedKeyText').textContent = secureKey;
             document.getElementById('purchasedKeyDisplay').classList.add('active');
@@ -1225,3 +1225,4 @@
     </script>
 </body>
 </html>
+
