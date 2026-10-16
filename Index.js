@@ -7,15 +7,15 @@ const db = admin.firestore();
 
 const CONFIG = {
     // VietQR / Ngân hàng
-    BANK_BIN: "970436",
-    ACCOUNT_NUMBER: "1234567890",
+    BANK_BIN: "0353774085",
+    ACCOUNT_NUMBER: "0353774085",
     ACCOUNT_NAME: "BUI VAN DUNG",
 
     // Webhook secret — tạo random: crypto.randomBytes(32).toString('hex')
     WEBHOOK_SECRET: process.env.WEBHOOK_SECRET || "YOUR_WEBHOOK_SECRET_HERE",
 
     // Prefix trong nội dung chuyển khoản để parse UID
-    DEPOSIT_PREFIX: "BVD-SONG-",
+    DEPOSIT_PREFIX: "UID-",
 
     // TTL cho processed orders (24h)
     ORDER_TTL_SECONDS: 86400,
