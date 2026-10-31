@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>@buivandung2012 Admin</title>
+<style>
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#fce7f3,#ffe4e6,#fbcfe8);color:#4c0519;padding:14px}.wrap{max-width:1200px;margin:auto}.card{background:rgba(255,255,255,.62);backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.85);border-radius:24px;padding:17px;margin-bottom:14px;box-shadow:0 10px 35px rgba(190,24,93,.08)}h1{margin:0 0 4px;font-size:24px}.sub{color:#881337;font-size:13px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}.stat{padding:14px;background:rgba(255,255,255,.65);border-radius:15px}.stat b{display:block;font-size:25px;color:#be185d;margin-top:3px}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar input{flex:1;min-width:220px;padding:12px;border:1px solid #f9a8d4;border-radius:12px;background:#fff8}.btn{border:0;border-radius:11px;padding:10px 13px;background:#db2777;color:#fff;font-weight:800;cursor:pointer}.btn.gray{background:#9d174d}.btn.red{background:#be123c}.btn.green{background:#15803d}.tabs{display:flex;gap:8px;margin-bottom:12px}.tab{background:#fff8;color:#9d174d;border:1px solid #f9a8d4}.tab.active{background:#db2777;color:#fff}.table-wrap{overflow:auto}table{width:100%;min-width:920px;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #fbcfe8;text-align:left;font-size:12px;vertical-align:top}th{color:#9d174d}.note{white-space:pre-wrap;max-width:230px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-weight:800;font-size:11px}.on{background:#fee2e2;color:#991b1b}.off{background:#dcfce7;color:#166534}.empty{text-align:center;padding:25px;color:#9d174d}@media(max-width:700px){.stats{grid-template-columns:1fr 1fr}h1{font-size:21px}}
+
+/* Responsive admin layout for desktop, tablets and landscape phones */
+html { -webkit-text-size-adjust: 100%; }
+body { padding: clamp(10px, 2vw, 24px); }
+.wrap { width: min(100%, 1500px); }
+.card { min-width: 0; }
+.table-wrap { max-width: 100%; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+table { width: 100%; }
+button, input { min-height: 40px; }
+button:focus-visible, input:focus-visible { outline: 3px solid rgba(190,24,93,.45); outline-offset: 2px; }
+@media (min-width: 1100px) {
+  .wrap { display: grid; grid-template-columns: minmax(0,1fr); gap: 16px; }
+  .card { padding: 22px; }
+  .stats { gap: 14px; }
+  .stat { padding: 18px; }
+  .stat b { font-size: 30px; }
+  th, td { padding: 12px; font-size: 13px; }
+}
+@media (max-width: 700px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .toolbar { align-items: stretch; }
+  .toolbar input { min-width: 0; width: 100%; flex-basis: 100%; }
+  .tabs { flex-wrap: wrap; }
+  .tab { flex: 1 1 auto; }
+  .card { padding: 13px; border-radius: 19px; }
+  h1 { font-size: 21px; }
+}
+@media (orientation: landscape) and (max-height: 600px) {
+  body { padding: 8px 12px; }
+  .card { padding: 12px; margin-bottom: 10px; }
+  .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .stat { padding: 10px; }
+  .stat b { font-size: 21px; }
+  .toolbar input { flex-basis: 240px; }
+  .tabs { margin-bottom: 8px; }
+}
+
+
+/* @buivandung2012 full-width adaptive layout override */
+html, body { width:100%; min-width:0; max-width:100%; }
+body { padding: clamp(10px, 2.2vw, 32px); }
+.main-container { width:100% !important; max-width:none !important; margin-left:auto !important; margin-right:auto !important; }
+img, video, canvas, iframe { max-width:100%; }
+input, select, textarea, button { max-width:100%; }
+@media (min-width: 900px) {
+  body { padding: clamp(18px, 3vw, 48px); }
+  .main-container { width:100% !important; max-width: min(100%, 1800px) !important; gap: clamp(18px, 2vw, 34px) !important; }
+}
+@media (min-width: 900px) and (orientation: landscape) {
+  .main-container { grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr) !important; align-items:start; }
+}
+@media (max-width: 899px) {
+  body { padding: 12px; }
+  .main-container { display:flex !important; flex-direction:column !important; width:100% !important; gap:14px !important; }
+  .main-container > * { width:100%; min-width:0; }
+}
+@media (max-width: 899px) and (orientation: landscape) {
+  body { padding: 10px; }
+  .main-container { display:grid !important; grid-template-columns:minmax(0, .9fr) minmax(0, 1.1fr) !important; align-items:start; gap:12px !important; }
+}
+@media (max-width: 560px) {
+  body { padding: 10px; }
+  .main-container { display:flex !important; flex-direction:column !important; }
+  .unified-header-card, .full-screen-card, .lookup-card { padding:18px 15px; border-radius:20px; }
+  .service-title { font-size:clamp(19px, 5vw, 25px); }
+}
+
+</style></head>
+<body><div class="wrap">
+<div class="card"><h1>🛠️ @buivandung2012 Admin</h1><div class="sub">Quản lý lượt gửi, người dùng và tài khoản bị ban</div><div class="stats"><div class="stat">Tổng lượt gửi<b id="total">0</b></div><div class="stat">Người dùng<b id="users">0</b></div><div class="stat">TK đang ban<b id="bans">0</b></div></div></div>
+<div class="card"><div class="tabs"><button class="btn tab active" id="tabSub" onclick="showTab('sub')">📋 Lượt gửi</button><button class="btn tab" id="tabBan" onclick="showTab('ban')">🚫 Tài khoản bị ban</button><button class="btn tab" id="tabCoins" onclick="showTab('coins')">🪙 Quản lý xu</button><button class="btn tab" id="tabTopups" onclick="showTab('topups')">💰 Nạp xu</button></div>
+<div id="subPanel"><div class="toolbar"><input id="q" placeholder="Tìm mã TK, TikTok hoặc Gmail"><button class="btn" onclick="load()">↻ Làm mới</button><button class="btn green" onclick="exportCSV()">⬇ Xuất CSV</button><button class="btn gray" onclick="logoutAdmin()">Đăng xuất</button></div><p id="msg" class="sub"></p><div class="table-wrap"><table><thead><tr><th>Thời gian</th><th>Mã</th><th>TikTok</th><th>Gmail</th><th>Ghi chú</th><th>Quản lý</th></tr></thead><tbody id="rows"></tbody></table></div></div>
+<div id="banPanel" style="display:none"><div class="table-wrap"><table><thead><tr><th>Mã TK</th><th>Trạng thái</th><th>Cập nhật</th><th>Quản lý</th></tr></thead><tbody id="banRows"></tbody></table></div></div><div id="topupsPanel" style="display:none"><div class="toolbar"><button class="btn" onclick="loadTopups()">↻ Làm mới</button></div><div class="table-wrap"><table><thead><tr><th>Thời gian</th><th>Mã TK</th><th>Số tiền</th><th>Số xu</th><th>Trạng thái</th><th>Quản lý</th></tr></thead><tbody id="topupRows"></tbody></table></div></div><div id="coinsPanel" style="display:none"><div class="toolbar"><button class="btn" onclick="loadCoins()">↻ Làm mới</button></div><p class="sub">Admin có thể cộng/trừ hoặc đặt lại số xu. Mỗi lần dame tiêu 1 xu.</p><div class="table-wrap"><table><thead><tr><th>Mã tài khoản</th><th>Thông tin đăng nhập</th><th>Xu</th><th>Cộng/trừ</th><th>Đặt xu</th></tr></thead><tbody id="coinRows"></tbody></table></div></div>
+</div></div>
+<script>
+let rows=[],bans=[];const $=id=>document.getElementById(id);
+let adminAuth=localStorage.getItem('@buivandung2012_admin_auth')||'';
+function getAuth(){
+  if(adminAuth)return adminAuth;
+  const u=window.prompt('Tên đăng nhập admin:','admin');
+  if(u===null||!u.trim()) throw Error('Chưa nhập tài khoản admin');
+  const p=window.prompt('Mật khẩu admin:');
+  if(p===null) throw Error('Đã hủy đăng nhập');
+  adminAuth='Basic '+btoa(unescape(encodeURIComponent(u+':'+p)));
+  localStorage.setItem('@buivandung2012_admin_auth',adminAuth);
+  return adminAuth;
+}
+function clearAuth(){localStorage.removeItem('@buivandung2012_admin_auth');adminAuth='';}
+function logoutAdmin(){clearAuth();location.reload()}
+function exportCSV(){const head=['Thời gian','Mã','TikTok','Gmail','Ghi chú'];const dataRows=[head,...rows.map(r=>[r.submittedAt,r.id,r.tiktokId,r.email,r.note])];const csv='\\ufeff'+dataRows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='@buivandung2012-submissions-'+new Date().toISOString().slice(0,10)+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function authHeaders(extra={}){return {...extra,Authorization:getAuth()};}const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function showTab(t){$('subPanel').style.display=t==='sub'?'block':'none';$('banPanel').style.display=t==='ban'?'block':'none';$('coinsPanel').style.display=t==='coins'?'block':'none';$('topupsPanel').style.display=t==='topups'?'block':'none';$('tabSub').classList.toggle('active',t==='sub');$('tabBan').classList.toggle('active',t==='ban');$('tabCoins').classList.toggle('active',t==='coins');$('tabTopups').classList.toggle('active',t==='topups');if(t==='topups')loadTopups();if(t==='ban')renderBans();if(t==='coins')loadCoins()}
+function render(){let q=$('q').value.toLowerCase();let a=rows.filter(r=>!q||Object.values(r).some(v=>String(v).toLowerCase().includes(q)));$('rows').innerHTML=a.map(r=>`<tr><td>${esc(new Date(r.submittedAt).toLocaleString('vi-VN'))}</td><td>${esc(r.userId)}<br><small>${esc(r.id)}</small></td><td>@${esc(r.tiktokId)}</td><td>${esc(r.email)}</td><td class="note">${esc(r.note)}</td><td><button type="button" class="btn red ban-btn" data-userid="${esc(r.userId)}">Ban TK</button><button type="button" class="btn gray del-btn" data-id="${esc(r.id)}">Xóa</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">Không có dữ liệu</td></tr>'}
+function renderBans(){let a=bans.filter(b=>b.userId);$('banRows').innerHTML=a.map(b=>`<tr><td><b>${esc(b.userId)}</b></td><td>${b.active?'<span class="pill on">ĐANG BAN</span>':'<span class="pill off">ĐÃ GỠ</span>'}</td><td>${esc(b.updatedAt?new Date(b.updatedAt).toLocaleString('vi-VN'):'')}</td><td>${b.active?`<button type="button" class="btn green unban-btn" data-userid="${esc(b.userId)}">Gỡ ban</button>`:'—'}</td></tr>`).join('')||'<tr><td colspan="4" class="empty">Chưa có tài khoản bị ban</td></tr>'}
+async function req(action,data){let r=await fetch('/manage.php?action='+encodeURIComponent(action),{method:'POST',headers:authHeaders({'Content-Type':'application/json'}),body:JSON.stringify(data||{})});let raw=await r.text();let d={};try{d=JSON.parse(raw)}catch{}if(r.status===401){clearAuth();throw Error('Sai tài khoản hoặc mật khẩu admin');}if(!r.ok)throw Error(d.error||raw||('HTTP '+r.status));return d}
+async function load(){try{let r=await fetch('/manage.php?action=admin_list',{cache:'no-store',headers:{Authorization:getAuth()}});if(r.status===401){clearAuth();throw Error('Sai tài khoản hoặc mật khẩu admin');}if(!r.ok)throw Error('API lỗi');let d=await r.json();rows=d.rows||[];bans=d.bans||[];$('total').textContent=d.totalSubmissions||0;$('users').textContent=d.uniqueUsers||0;$('bans').textContent=d.activeBans||0;$('msg').textContent='✓ Đã cập nhật';render();renderBans()}catch(e){$('msg').textContent='❌ '+e.message}}
+async function ban(userId){try{if(!userId)throw Error('Thiếu mã tài khoản');if(!window.confirm('Ban tài khoản '+userId+'?'))return; $('msg').textContent='⏳ Đang ban '+userId+'...'; const d=await req('ban_user',{userId:String(userId)}); if(!d.ok)throw Error(d.error||'Ban tài khoản thất bại'); await load(); $('msg').textContent='✓ Đã ban '+userId; alert('Đã ban tài khoản: '+userId)}catch(e){$('msg').textContent='❌ '+e.message;alert('Ban tài khoản thất bại: '+e.message)}}
+async function unban(userId){if(!confirm('Gỡ ban tài khoản '+userId+'?'))return;try{const d=await req('unban_user',{userId});if(!d.ok)throw Error(d.error||'Gỡ ban thất bại');await load();alert('Đã gỡ ban: '+userId)}catch(e){alert('Gỡ ban thất bại: '+e.message)}}
+async function del(id){if(!confirm('Xóa lượt gửi này?'))return;try{await req('delete_submission',{id});await load()}catch(e){alert(e.message)}}
+async function loadTopups(){try{let r=await fetch('/manage.php?action=admin_topups',{cache:'no-store',headers:{Authorization:getAuth()}});let d=await r.json();if(r.status===401){clearAuth();throw Error('Sai tài khoản hoặc mật khẩu admin')}let a=d.rows||[];$('topupRows').innerHTML=a.map(x=>`<tr><td>${esc(new Date(x.createdAt).toLocaleString('vi-VN'))}</td><td><b>${esc(x.userId)}</b></td><td>${Number(x.amount||0).toLocaleString('vi-VN')}đ</td><td>${Number(x.coins||0)} xu</td><td>${esc(x.status)}</td><td>${x.status==='pending'?`<button class="btn green" onclick="topupAction('${esc(x.id)}','approve_topup')">Duyệt</button> <button class="btn red" onclick="topupAction('${esc(x.id)}','reject_topup')">Từ chối</button>`:'-'}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">Chưa có yêu cầu nạp</td></tr>'}catch(e){alert(e.message)}}
+async function topupAction(id,action){try{let d=await req(action,{id});if(!d.ok)throw Error(d.error||'Thất bại');await loadTopups();if(action==='approve_topup')await loadCoins()}catch(e){alert(e.message)}}
+async function loadCoins(){try{let r=await fetch('/manage.php?action=admin_accounts',{cache:'no-store',headers:{Authorization:getAuth()}});let d=await r.json();if(r.status===401){clearAuth();throw Error('Sai tài khoản hoặc mật khẩu admin')}let a=d.accounts||[];$('coinRows').innerHTML=a.map(x=>`<tr><td><b>${esc(x.userId)}</b></td><td>${esc(x.name||'—')}<br><small>${esc(x.email||'Chưa đăng ký email')}</small></td><td><span class="pill off">${x.coins} xu</span></td><td><input id="add_${esc(x.userId)}" type="number" value="1" style="width:90px"><button class="btn green" onclick="changeCoins('${esc(x.userId)}', 'add')">Cộng</button><button class="btn red" onclick="changeCoins('${esc(x.userId)}', 'sub')">Trừ</button></td><td><input id="set_${esc(x.userId)}" type="number" value="${x.coins}" style="width:90px"><button class="btn" onclick="changeCoins('${esc(x.userId)}','set')">Lưu</button></td></tr>`).join('')||'<tr><td colspan="4" class="empty">Chưa có tài khoản</td></tr>'}catch(e){alert(e.message)}}
+async function changeCoins(userId,mode){try{let el=$(mode==='set'?'set_'+userId:'add_'+userId);let n=parseInt(el?.value||'0',10);if(mode==='sub')n=-Math.abs(n);if(!Number.isFinite(n))return;let action=mode==='set'?'set_coins':'add_coins';let d=await req(action,{userId,coins:n});if(!d.ok)throw Error(d.error||'Thất bại');await loadCoins()}catch(e){alert(e.message)}}
+document.addEventListener('click',e=>{const b=e.target.closest('.ban-btn');if(b){e.preventDefault();ban(b.dataset.userid);return}const u=e.target.closest('.unban-btn');if(u){e.preventDefault();unban(u.dataset.userid);return}const d=e.target.closest('.del-btn');if(d){e.preventDefault();del(d.dataset.id);return}});$('q').oninput=render;load();
+</script></body></html>
+
